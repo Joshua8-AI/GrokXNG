@@ -115,6 +115,8 @@ docker exec searxng wget -qO- http://grokipedia-proxy:5000/health
 
 ## SearxNG Configuration
 
+**For complete setup instructions, see [SEARXNG_SETUP.md](SEARXNG_SETUP.md).**
+
 The integration requires two configuration changes in the SearxNG setup:
 
 **1. Volume Mount** (in SearxNG's `docker-compose.yml`):

@@ -41,6 +41,12 @@ The integration has been configured:
 4. ✓ SearxNG docker-compose updated to mount the engine
 5. ✓ SearxNG settings.yml updated with Grokipedia source
 
+## Documentation
+
+- **[SearxNG Setup Guide](SEARXNG_SETUP.md)** - Complete step-by-step instructions for integrating with SearxNG
+- **[CLAUDE.md](CLAUDE.md)** - Technical architecture and development guide
+- **[MODIFICATIONS_SUMMARY.md](MODIFICATIONS_SUMMARY.md)** - Audit trail of all changes
+
 ## Quick Start
 
 ### 1. Start the Grokipedia Proxy
@@ -63,9 +69,15 @@ curl http://localhost:5000/api/rest_v1/page/summary/Python
 curl http://localhost:5000/api/rest_v1/page/summary/Artificial_intelligence
 ```
 
-### 3. Restart SearxNG
+### 3. Configure and Restart SearxNG
 
-Restart SearxNG to load the new engine and volume mount:
+**See [SEARXNG_SETUP.md](SEARXNG_SETUP.md) for detailed configuration instructions.**
+
+Quick summary - you need to modify two SearxNG files:
+1. `docker-compose.yml` - Add volume mount for custom engine
+2. `searx/settings.yml` - Add Grokipedia engine configuration and enable HTTP
+
+Then restart SearxNG:
 
 ```bash
 # From your SearxNG directory
@@ -87,6 +99,8 @@ You should see results from both the infobox and the results list!
 ### Configuration-Only Integration ✅
 
 **No SearxNG source code was modified.** All changes are configuration files that work with the official Docker image.
+
+**For step-by-step setup instructions, see [SEARXNG_SETUP.md](SEARXNG_SETUP.md).**
 
 ### 1. Grokipedia Proxy (This Directory)
 - `proxy.py` - Flask app that scrapes Grokipedia.com (URL: `https://grokipedia.com/page/{title}`)
