@@ -1,0 +1,10 @@
+# Add this to your SearxNG settings.yml file after the Wikipedia engine entry
+# Location: searx/settings.yml (around line 543)
+
+  - name: grokipedia
+    engine: grokipedia
+    shortcut: grok
+    base_url: http://grokipedia-proxy:5000
+    # add "list" to the array to get results in the results list
+    display_type: ["infobox", "list"]
+    categories: [general]
