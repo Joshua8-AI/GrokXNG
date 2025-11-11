@@ -53,7 +53,7 @@ The integration has been configured:
 
 ```bash
 # From this project directory
-docker-compose up -d --build
+docker compose up -d --build
 ```
 
 The proxy runs on the internal Docker network only (not publicly accessible for security).
@@ -100,7 +100,7 @@ Then restart SearxNG:
 ```bash
 # From your SearxNG directory
 cd ../searxng
-docker-compose restart searxng
+docker compose restart searxng
 ```
 
 ### 4. Test in SearxNG
@@ -134,7 +134,7 @@ You should see results from both the infobox and the results list!
 ### 3. Network Integration
 - Proxy runs on Docker network: `searxng`
 - SearxNG can access proxy at: `http://grokipedia-proxy:5000`
-- External access: `http://localhost:5000`
+- External access: **Internal only** (not publicly exposed for security)
 
 ### 4. SearxNG Configuration Files Modified
 
@@ -276,9 +276,11 @@ SearxNG Container
   ```bash
   docker ps | grep -E "searxng|grokipedia"
   ```
-- Test proxy directly:
+- Test proxy from within Docker network:
   ```bash
-  curl http://localhost:5000/health
+  docker exec grokipedia-proxy curl -f http://localhost:5000/health
+  # Or from SearxNG container
+  docker exec searxng wget -qO- http://grokipedia-proxy:5000/health
   ```
 
 ### No results in SearxNG
@@ -289,7 +291,7 @@ SearxNG Container
   ```
 - Check proxy logs:
   ```bash
-  docker-compose logs -f
+  docker compose logs -f
   ```
 - Verify the engine is loaded:
   ```bash
@@ -299,11 +301,11 @@ SearxNG Container
 ### Parse errors or "No summary available"
 
 - Grokipedia's HTML structure may have changed
-- Check logs: `docker-compose logs -f grokipedia-proxy`
+- Check logs: `docker compose logs -f grokipedia-proxy`
 - Update CSS selectors in `proxy.py` if needed (currently uses `<article>` and `<p>` tags)
-- Test a specific article:
+- Test a specific article from within Docker network:
   ```bash
-  curl http://localhost:5000/api/rest_v1/page/summary/Python
+  docker exec grokipedia-proxy curl http://localhost:5000/api/rest_v1/page/summary/Python
   ```
 
 ### Grokipedia shows "0 articles available"
