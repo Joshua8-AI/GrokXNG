@@ -223,14 +223,24 @@ cd ../seargrok
 docker compose restart grokipedia-proxy
 ```
 
-### Change Port
+### Network Configuration
 
-Edit `docker-compose.yml` to change the exposed port:
+**Default Setup (Production):**
+The proxy runs on the internal Docker network only (no public ports) for security.
+
+**Temporary Public Access (Development Only):**
+If you need to expose the proxy for local testing, add to `docker-compose.yml`:
 
 ```yaml
-ports:
-  - "YOUR_PORT:5000"
+services:
+  grokipedia-proxy:
+    ports:
+      - "127.0.0.1:5000:5000"  # Localhost only
+      # or
+      - "YOUR_PORT:5000"       # Custom port (use with caution)
 ```
+
+**Note:** Remove port exposure after testing to maintain security.
 
 ## Architecture
 
