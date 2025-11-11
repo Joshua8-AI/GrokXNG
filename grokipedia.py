@@ -93,8 +93,8 @@ def response(resp):
     # Build Grokipedia URL
     grokipedia_link = f"https://grokipedia.com/page/{urllib.parse.quote(title.replace(' ', '_'))}"
 
-    # Add result to list if 'list' is in display_type
-    if "list" in display_type:
+    # Add result to list if 'list' is in display_type and we have content
+    if "list" in display_type and extract:
         results.append({
             'url': grokipedia_link,
             'title': title,

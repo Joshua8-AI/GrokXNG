@@ -56,17 +56,35 @@ The integration has been configured:
 docker-compose up -d --build
 ```
 
-The proxy will be available at `http://localhost:5000`
+The proxy runs on the internal Docker network only (not publicly accessible for security).
 
 ### 2. Test the Proxy
 
+**Option A: Test from within the Docker network**
 ```bash
-# Health check
-curl http://localhost:5000/health
+# Health check from SearxNG container
+docker exec searxng wget -qO- http://grokipedia-proxy:5000/health
 
-# Test a query (note: Grokipedia uses /page/ prefix)
-curl http://localhost:5000/api/rest_v1/page/summary/Python
+# Test a query from SearxNG container
+docker exec searxng wget -qO- http://grokipedia-proxy:5000/api/rest_v1/page/summary/Python
+
+# Or from the proxy container itself
+docker exec grokipedia-proxy curl http://localhost:5000/health
+docker exec grokipedia-proxy curl http://localhost:5000/api/rest_v1/page/summary/Python
+```
+
+**Option B: Temporarily expose for testing (development only)**
+```bash
+# Add to docker-compose.yml temporarily:
+#   ports:
+#     - "127.0.0.1:5000:5000"  # Localhost only
+# Then: docker-compose up -d
+
+# Test locally
+curl http://localhost:5000/health
 curl http://localhost:5000/api/rest_v1/page/summary/Artificial_intelligence
+
+# Remove port mapping when done for security
 ```
 
 ### 3. Configure and Restart SearxNG

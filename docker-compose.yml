@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   grokipedia-proxy:
     build: .
     container_name: grokipedia-proxy
-    ports:
-      - "5000:5000"
+    # No public port exposure - only accessible via internal Docker network
+    # SearxNG connects using: http://grokipedia-proxy:5000
     restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1

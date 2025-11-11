@@ -172,14 +172,22 @@ docker-compose up -d --build
 ### Verify Proxy is Running
 
 ```bash
-# Health check
-curl http://localhost:5000/health
+# Check container is running
+docker ps | grep grokipedia-proxy
+
+# Health check (from within Docker network)
+docker exec grokipedia-proxy curl -f http://localhost:5000/health
 # Expected: {"status":"healthy"}
 
+# Or test from SearxNG container
+docker exec searxng wget -qO- http://grokipedia-proxy:5000/health
+
 # Test article fetch
-curl http://localhost:5000/api/rest_v1/page/summary/Python
+docker exec grokipedia-proxy curl http://localhost:5000/api/rest_v1/page/summary/Python
 # Expected: JSON response with Wikipedia-compatible format
 ```
+
+**Note:** The proxy is not publicly exposed for security. It's only accessible via the internal Docker network.
 
 ### Restart SearxNG
 
@@ -238,8 +246,9 @@ You should see results from multiple engines including Grokipedia (if configured
 ## Verification Checklist
 
 - [ ] Grokipedia proxy is running: `docker ps | grep grokipedia-proxy`
-- [ ] Proxy health check passes: `curl http://localhost:5000/health`
+- [ ] Proxy health check passes: `docker exec grokipedia-proxy curl -f http://localhost:5000/health`
 - [ ] Both containers on same network: `docker network inspect searxng`
+- [ ] Network connectivity works: `docker exec searxng wget -qO- http://grokipedia-proxy:5000/health`
 - [ ] Custom engine file is mounted: `docker exec searxng ls /usr/local/searxng/searx/engines/grokipedia.py`
 - [ ] Settings.yml has Grokipedia engine entry: `docker exec searxng grep -A 7 "name: grokipedia" /etc/searxng/settings.yml`
 - [ ] HTTP is enabled: `docker exec searxng grep "enable_http: true" /etc/searxng/settings.yml`
@@ -299,14 +308,14 @@ docker-compose restart searxng
 
 **Solution:**
 ```bash
-# Test proxy directly
-curl http://localhost:5000/api/rest_v1/page/summary/Python
+# Test proxy directly (from within Docker network)
+docker exec grokipedia-proxy curl http://localhost:5000/api/rest_v1/page/summary/Python
 
 # Check proxy logs
-docker-compose -f ../seargrok/docker-compose.yml logs -f grokipedia-proxy
+docker logs grokipedia-proxy -f
 
 # Verify Grokipedia website is accessible
-curl https://grokipedia.com/page/Python
+docker exec grokipedia-proxy curl -I https://grokipedia.com/page/Python
 ```
 
 ### Issue: SearxNG won't start after changes

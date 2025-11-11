@@ -63,21 +63,37 @@ def get_summary(title):
         logger.info(f"Successfully processed: {title}")
         return jsonify(fake_wiki_response)
 
-    except requests.RequestException as e:
-        logger.error(f"Error fetching from Grokipedia: {e}")
+    except requests.HTTPError as e:
+        # 404s and other HTTP errors should return empty results for SearxNG
+        logger.warning(f"HTTP error from Grokipedia ({e.response.status_code}): {groki_url}")
         return jsonify({
-            "type": "error",
+            "type": "standard",
             "title": title.replace('_', ' '),
-            "extract": f"Error fetching from Grokipedia: {str(e)}",
+            "extract": "",
             "extract_html": "",
-            "lang": "en"
-        }), 500
+            "lang": "en",
+            "dir": "ltr",
+            "timestamp": None
+        }), 200
+    except requests.RequestException as e:
+        # Network errors, timeouts, etc. - return empty results
+        logger.error(f"Network error fetching from Grokipedia: {e}")
+        return jsonify({
+            "type": "standard",
+            "title": title.replace('_', ' '),
+            "extract": "",
+            "extract_html": "",
+            "lang": "en",
+            "dir": "ltr",
+            "timestamp": None
+        }), 200
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+        # Parsing errors - return error with fallback text
+        logger.error(f"Parsing error: {e}")
         return jsonify({
             "type": "error",
             "title": title.replace('_', ' '),
-            "extract": f"Unexpected error: {str(e)}",
+            "extract": f"Error parsing content: {str(e)}",
             "extract_html": "",
             "lang": "en"
         }), 500
